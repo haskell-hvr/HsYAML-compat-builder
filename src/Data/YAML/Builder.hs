@@ -19,24 +19,26 @@ module Data.YAML.Builder
     , bool
     , namedBool
     , maybeNamedBool
-    -- , nulll
-    -- , namedNull
-    -- , maybeNamedNull
+    , null'
+    , namedNull
+    , maybeNamedNull
     , alias
     , toEvents
     ) where
       
-import Control.Arrow (second)
+import           Control.Arrow (second)
+import           Data.Text              (Text,empty)
+import           Data.YAML.Event        as YE
+import qualified Data.YAML.Schema       as YS
 -- import           Control.Applicative    as Ap
 -- import           Control.Monad.Identity (runIdentity)
 -- import           Data.Aeson             as J
 -- import qualified Data.Aeson.Types       as J
 -- import qualified Data.ByteString.Lazy   as BS.L
 -- import qualified Data.ByteString        as BS
-import           Data.Text              (Text,empty)
 -- import qualified Data.Vector            as V
-import qualified Data.YAML              as Y 
-import           Data.YAML.Event        as YE
+-- import qualified Data.YAML              as Y 
+
 -- import qualified Data.YAML.Event        as YE
 -- import qualified Data.YAML.Token        as YT
 -- import           Data.Scientific
@@ -56,7 +58,7 @@ instance ToYaml a => ToYaml [a] where
 instance ToYaml Text where
     toYaml = string
 instance ToYaml Int where
-    toYaml i = YamlBuilder (YE.Scalar Nothing untagged Plain (Y.encodeInt (toInteger i)): )
+    toYaml i = YamlBuilder (YE.Scalar Nothing untagged Plain (YS.encodeInt (toInteger i)): )
 
 
 maybeNamedMapping :: Maybe Anchor -> [(Text, YamlBuilder)] -> YamlBuilder
@@ -106,7 +108,7 @@ namedString :: Text -> Text -> YamlBuilder
 namedString name = maybeNamedString $ Just name
 
 maybeNamedBool :: Maybe Text -> Bool -> YamlBuilder
-maybeNamedBool anchor b = YamlBuilder (YE.Scalar anchor untagged Plain (Y.encodeBool b) :)
+maybeNamedBool anchor b = YamlBuilder (YE.Scalar anchor untagged Plain (YS.encodeBool b) :)
 
 bool :: Bool -> YamlBuilder
 bool = maybeNamedBool Nothing
@@ -117,8 +119,8 @@ namedBool name = maybeNamedBool $ Just name
 maybeNamedNull :: Maybe Text -> YamlBuilder
 maybeNamedNull anchor = YamlBuilder (YE.Scalar anchor untagged Plain empty :)
 
-nulll :: YamlBuilder
-nulll = maybeNamedNull Nothing
+null' :: YamlBuilder
+null' = maybeNamedNull Nothing
 
 namedNull :: Text -> YamlBuilder
 namedNull name = maybeNamedNull $ Just name
